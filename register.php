@@ -14,21 +14,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $username_err = "Please enter a username.";
     } else{
         // Prepare a select statement
-        $sql = "SELECT id FROM users WHERE username = ?";
+        $sql = "SELECT id FROM users WHERE username = :username";
         
-        if($stmt = $mysqli->prepare($sql)){
+        if($stmt = $pdo->prepare($sql)){
             // Bind variables to the prepared statement as parameters
-            $stmt->bind_param("s", $param_username);
+            $stmt->bindParam(":username", $param_username, PDO::PARAM_STR);
             
             // Set parameters
             $param_username = trim($_POST["username"]);
             
             // Attempt to execute the prepared statement
             if($stmt->execute()){
-                // store result
-                $stmt->store_result();
-                
-                if($stmt->num_rows == 1){
+                if($stmt->rowCount() == 1){
                     $username_err = "This username is already taken.";
                 } else{
                     $username = trim($_POST["username"]);
@@ -39,13 +36,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
          
         // Close statement
-        $stmt->close();
+        unset($stmt);
     }
     
     // Validate password
     if(empty(trim($_POST["password"]))){
         $password_err = "Please enter a password.";     
-    } elseif(strlen(trim($_POST["password"])) > 6){
+    } elseif(strlen(trim($_POST["password"])) < 6){
         $password_err = "Password must have atleast 6 characters.";
     } else{
         $password = trim($_POST["password"]);
@@ -65,11 +62,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty($username_err) && empty($password_err) && empty($confirm_password_err)){
         
         // Prepare an insert statement
-        $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+        $sql = "INSERT INTO users (username, password) VALUES (:username, :password)";
          
-        if($stmt = $mysqli->prepare($sql)){
+        if($stmt = $pdo->prepare($sql)){
             // Bind variables to the prepared statement as parameters
-            $stmt->bind_param("ss", $param_username, $param_password);
+            $stmt->bindParam(":username", $param_username, PDO::PARAM_STR);
+            $stmt->bindParam(":password", $param_password, PDO::PARAM_STR);
             
             // Set parameters
             $param_username = $username;
@@ -85,11 +83,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
          
         // Close statement
-        $stmt->close();
+        unset($stmt);
     }
     
     // Close connection
-    $mysqli->close();
+    unset($pdo);
 }
 ?>
  
@@ -99,11 +97,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <meta charset="UTF-8">
     <title>Sign Up</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
-    
-    <!-- <link href="CSS/styles.css" type="text/css" rel="stylesheet"> -->
+    <style type="text/css">
+        body{ font: 14px sans-serif; }
+        .wrapper{ width: 350px; padding: 20px; }
+    </style>
 </head>
 <body>
-    <!-- <div class="wrapper">
+    <div class="wrapper">
         <h2>Sign Up</h2>
         <p>Please fill this form to create an account.</p>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
@@ -123,42 +123,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <span class="help-block"><?php echo $confirm_password_err; ?></span>
             </div>
             <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Submit">
-                <input type="reset" class="btn btn-default" value="Reset">
+                <input type="submit" class="btn btn-primary" id="button"value="Submit">
+                <input type="reset" class="btn btn-default" id="button"value="Reset">
             </div>
             <p>Already have an account? <a href="login.php">Login here</a>.</p>
         </form>
-    </div>     -->
-
-    <form class="login-form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-  <p class="login-text">
-    <span class="fa-stack fa-lg">
-      <i class="fa fa-circle fa-stack-2x"></i>
-      <i class="fa fa-lock fa-stack-1x"></i>
-    </span>
-  </p>
-  <div class="form-group <?php echo (!empty($username_err)) ? 'has-error' : ''; ?>">
-  <input type="text" name="username" class="login-username" autofocus="true" required="true" placeholder="Username" value="<?php echo $username; ?>" />
-  <span class="help-block"><?php echo $username_err; ?></span>
-</div>
-
-<div class="form-group <?php echo (!empty($password_err)) ? 'has-error' : ''; ?>">
-  <input type="password" name="password" class="login-password" required="true" placeholder="Password" value="<?php echo $password; ?>"/>
-  <span class="help-block"><?php echo $password_err; ?></span>
-</div> 
-
-<div class="form-group <?php echo (!empty($confirm_password_err)) ? 'has-error' : ''; ?>">
-  <input type="password" name="confirm_password" class="login-password" required="true" placeholder="Confirm Password" value="<?php echo $confirm_password; ?>"/>
-  <span class="help-block"><?php echo $confirm_password_err; ?></span>
-</div> 
-
-<input type="submit" name="submit" value="Subimt" class="login-submit">
-  <input type="reset" name="reset" value="Reset" class="login-submit" />
-
-
-<a href="login.php" class="login-forgot-pass">Have An Account? Login Here</a>
-<div class="underlay-photo"></div>
-<div class="underlay-black"></div> 
-</form>
+    </div>    
 </body>
 </html>
