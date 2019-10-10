@@ -1,0 +1,47 @@
+body{ font: 14px sans-serif; 
+    text-align: center;
+    color: aliceblue !important; 
+    font-family: 'Source Sans Pro', sans-serif !important;
+    background-image: url("../images/smoke.jpg");
+}
+p{
+    width:100%;
+}
+.wrapper{
+    width: 80% !important; 
+    margin-top:8%;
+   padding-left:30% ! important;
+   text-align:left;
+}
+#fillin{
+    width: 350px !important;
+}
+#sign{
+color: aliceblue !important ;
+text-decoration-line: underline !important;
+}
+h1{
+ margin-left:25% !important;  
+ padding-top: 5% !important;
+}
+#button1{
+    color: aliceblue;
+    background-color: rgb(50, 36, 247);
+    border: rgb(50, 36, 247);
+    margin-left:30% !important;
+}
+#button{
+    color: aliceblue;
+    background-color: rgb(50, 36, 247);
+    border: rgb(50, 36, 247);
+}
+#delete{
+    color: aliceblue;
+    background-color: rgb(50, 36, 247);
+    border: rgb(50, 36, 247);
+}
+#button-addon2{
+    color: aliceblue;
+    background-color: rgb(50, 36, 247);  
+    border: rgb(50, 36, 247);
+}
