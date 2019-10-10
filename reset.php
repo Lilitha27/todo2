@@ -40,11 +40,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Check input errors before updating the database
     if(empty($new_password_err) && empty($confirm_password_err)){
         // Prepare an update statement
-        $sql = "UPDATE users SET password = ? WHERE id = ?";
+        $sql = "UPDATE users SET password = :password WHERE id = :id";
         
-        if($stmt = $mysqli->prepare($sql)){
+        if($stmt = $pdo->prepare($sql)){
             // Bind variables to the prepared statement as parameters
-            $stmt->bind_param("si", $param_password, $param_id);
+            $stmt->bindParam(":password", $param_password, PDO::PARAM_STR);
+            $stmt->bindParam(":id", $param_id, PDO::PARAM_INT);
             
             // Set parameters
             $param_password = password_hash($new_password, PASSWORD_DEFAULT);
@@ -62,11 +63,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
         
         // Close statement
-        $stmt->close();
+        unset($stmt);
     }
     
     // Close connection
-    $mysqli->close();
+    unset($pdo);
 }
 ?>
  
@@ -75,53 +76,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <head>
     <meta charset="UTF-8">
     <title>Reset Password</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
-    
-    <link href="CSS/styles.css" type="text/css" rel="stylesheet">
+    <style type="text/css">
+        body{ font: 14px sans-serif; }
+        .wrapper{ width: 350px; padding: 20px; }
+    </style>
 </head>
 <body>
-    <!-- <div class="wrapper">
+    <div class="wrapper">
         <h2>Reset Password</h2>
         <p>Please fill out this form to reset your password.</p>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post"> 
             <div class="form-group <?php echo (!empty($new_password_err)) ? 'has-error' : ''; ?>">
                 <label>New Password</label>
-                <input type="password" name="new_password" class="form-control" value="<?php echo $new_password; ?>">
+                <input type="password" name="new_password" class="form-control" id="fillin" value="<?php echo $new_password; ?>">
                 <span class="help-block"><?php echo $new_password_err; ?></span>
             </div>
             <div class="form-group <?php echo (!empty($confirm_password_err)) ? 'has-error' : ''; ?>">
                 <label>Confirm Password</label>
-                <input type="password" name="confirm_password" class="form-control">
+                <input type="password" name="confirm_password" class="form-control" id="fillin">
                 <span class="help-block"><?php echo $confirm_password_err; ?></span>
             </div>
             <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Submit">
-                <a class="btn btn-link" href="welcome.php">Cancel</a>
+                <input type="submit" class="btn btn-primary" id="button" value="Submit">
+                <a class="btn btn-link" href="welcome.php" id="sign">Cancel</a>
             </div>
         </form>
-    </div>     -->
-
-    <form class="login-form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-  <p class="login-text">
-    <span class="fa-stack fa-lg">
-      <i class="fa fa-circle fa-stack-2x"></i>
-      <i class="fa fa-lock fa-stack-1x"></i>
-    </span>
-  </p>
-<div class="form-group <?php echo (!empty($new_password_err)) ? 'has-error' : ''; ?>">
-  <input type="password" name="new_password" class="login-password" required="true" placeholder="New Password" value="<?php echo $new_password; ?>"/>
-  <span class="help-block"><?php echo $new_password_err; ?></span>
-</div> 
-
-<div class="form-group <?php echo (!empty($confirm_password_err)) ? 'has-error' : ''; ?>">
-  <input type="password" name="confirm_password" class="login-password" required="true" placeholder="Confirm Password" value="<?php echo $confirm_password; ?>"/>
-  <span class="help-block"><?php echo $confirm_password_err; ?></span>
-</div> 
-
-<input type="submit" name="submit" value="Subimt" class="login-submit" />
-<a href="welcome.php" class="login-forgot-pass">Cancel</a>
-<div class="underlay-photo"></div>
-<div class="underlay-black"></div> 
-</form>
+    </div>    
 </body>
 </html>
